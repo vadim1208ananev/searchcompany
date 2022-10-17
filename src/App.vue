@@ -1,26 +1,34 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="container">
+     <app-top></app-top>
+     <div class="block-form">
+
+     </div>
+    <app-bottom></app-bottom>
+
+  </div>
+
+
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import AppTop from "./components/AppTop";
+import AppBottom from "./components/AppBottom";
 export default {
   name: 'App',
+
   components: {
-    HelloWorld
+      AppTop,AppBottom
   }
 }
 </script>
-
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+  .container{
+    max-width: 1410px;
+    margin: 0 auto;
+  }
+    .top-block{
+
+    }
 </style>
+
