@@ -43,7 +43,13 @@
         methods: {
             SendMessage() {
                 if (!this.finder.length) return
-                fetch('http://search.loc/api.php')
+                var formdata = new FormData();
+                formdata.append("search_param", this.finder.trim())
+                var requestOptions={
+                    method: 'POST',
+                    body:formdata,
+                }
+                fetch(`http://search.loc/api.php`,requestOptions)
                     .then(res=>res.json())
                     .then(row=>{console.log(row);});
             }
