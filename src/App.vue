@@ -4,25 +4,24 @@
         <app-top></app-top>
         <div class="block-form">
             <div class="block-form-items">
-                {{statusFinder}}
-                <div class="block-notify">
-                    <div class="top-notify">{{getTitle}}</div>
-                    <div class="bottom-notify">{{description}}</div>
+                    <div class="block-notify">
+                    <div :class="{'light-red':statusFinder=='busy','light-green':statusFinder=='free'}"  class="top-notify">{{getTitle}}</div>
+                    <div class="bottom-notify">{{getDescription}}</div>
                 </div>
-                <div class="own-form">
+                <div v-if="statusFinder!='free'" class="own-form">
                     <div class="form-items">
                         <input
                                 type="text"
-                                v-model="finder"
-                                :placeholder="btnPlaceholder"
+                                v-model="finderInput"
+                                :placeholder="getInputPlaceholder"
                                 @keydown.enter="SendMessage"
                         >
-                        <button @click="SendMessage" type="button">{{btnText}}</button>
+                        <button @click="SendMessage" type="button">{{getBtnText}}</button>
                     </div>
                 </div>
-                <div v-if="statusFinder=='busy'" class="block-link"><a :href="lowerlinkUrl">{{lowerlinkText}}</a></div>
-                <div @click="restart" v-if="statusFinder=='free'" class="block-link-free-restart"><a >{{linkRestartText}}</a></div>
-
+                <app-text-area-block  :statusDisplay="statusFinder"></app-text-area-block>
+                <div  class="block-link-help"><a :href="getHelpLink">{{getHelpText}}</a></div>
+                <div @click="restart" v-if="statusFinder=='free'" class="block-link-free-restart"><a>Restart Your Search</a></div>
             </div>
         </div>
         <app-bottom></app-bottom>
@@ -32,20 +31,15 @@
     import AppTop from "./components/AppTop";
     import AppBottom from "./components/AppBottom";
     import FullPreloader from "./components/FullPreloader";
-
+    import AppTextAreaBlock from "./components/AppTextAreaBlock";
+    import {getCaption,sendRequest} from "./api"
     export default {
         name: 'App',
         data() {
             return {
-                statusFinder:'default',
-                finder: '',
-                title: 'Is Your Company Name Available?',
-                description: 'Enter your desired company name below to ckeck on Companies House..',
-                btnPlaceholder: "Enter your desired company name",
-                btnText: "Check Now",
-                lowerlinkText: 'Need hepl?Get tips on how name a company',
-                linkRestartText:'Restart Your Search',
-                lowerlinkUrl: '/help',
+               statusFinder:'default',
+                finderInput: '',
+                pickedFinderInput:'',
                 insideData:'',
             }
         },
@@ -54,62 +48,48 @@
        },
         computed:{
          getTitle(){
-
-             return this.insideData[this.statusFinder].title
-         }
+             return this.insideData[this.statusFinder].title?this.insideData[this.statusFinder].title.replace('COMPANY-NAME',this.pickedFinderInput):''
+         },
+         getDescription(){
+             return this.insideData[this.statusFinder].description?this.insideData[this.statusFinder].description:''
+         },
+         getInputPlaceholder(){
+             return this.insideData[this.statusFinder].inputPlaceholder?this.insideData[this.statusFinder].inputPlaceholder:''
+         },
+          getBtnText(){
+             return this.insideData[this.statusFinder].btnText?this.insideData[this.statusFinder].btnText:''
+          },
+          getHelpText(){
+              return this.insideData[this.statusFinder].helpText?this.insideData[this.statusFinder].helpText:''
+          },
+            getHelpLink(){
+                return this.insideData[this.statusFinder].helpLink?this.insideData[this.statusFinder].helpLink:''
+            }
         },
      methods:{
             restart(){
                this.statusFinder='default'
-                this.finder=''
+                this.finderInput=''
             },
             loadInsideData(){
-                setTimeout(()=>{
-                   this.insideData={
+                getCaption(1).then(row=>{
+                    console.log(row)
+                    this.insideData=row})
 
-                       default:{title: 'Is Your Company Name Available?default',
-                           description: 'Enter your desired company name below to ckeck on Companies House..',
-                           btnPlaceholder: "Enter your desired company name",
-                           btnText: "Check Now",
-                           lowerlinkText: 'Need hepl?Get tips on how name a company',
-                           linkRestartText:'Restart Your Search',
-                           lowerlinkUrl: '/help'},
-
-                       busy:{title: 'Is Your Company Name Available?busy',
-                           description: 'Enter your desired company name below to ckeck on Companies House..',
-                           btnPlaceholder: "Enter your desired company name",
-                           btnText: "Check Now",
-                           lowerlinkText: 'Need hepl?Get tips on how name a company',
-                           linkRestartText:'Restart Your Search',
-                           lowerlinkUrl: '/help'},
-                       free:{title: 'Is Your Company Name Available?free',
-                           description: 'Enter your desired company name below to ckeck on Companies House..',
-                           btnPlaceholder: "Enter your desired company name",
-                           btnText: "Check Now",
-                           lowerlinkText: 'Need hepl?Get tips on how name a company',
-                           linkRestartText:'Restart Your Search',
-                           lowerlinkUrl: '/help'},
-                   }
-                },1000)
             },
             SendMessage() {
-                if (!this.finder.length) return
-                var formdata = new FormData();
-                formdata.append("search_param", this.finder.trim())
-                var requestOptions={
-                    method: 'POST',
-                    body:formdata,
-                }
-                fetch(`http://search.loc/api.php`,requestOptions)
-                    .then(res=>res.json())
-                    .then(row=>{
+                if (!this.finderInput.length) return
+                sendRequest(this.finderInput.trim()).then(
+                    row=>{
                         console.log(row.status)
                         this.statusFinder=row.status
-
-                    });
+                        this.pickedFinderInput=this.finderInput
+                    }
+                )
             }
         },
         components: {
+            AppTextAreaBlock,
             FullPreloader,
             AppTop, AppBottom
         }
@@ -117,6 +97,12 @@
 </script>
 <style>
 
+    .light-red{
+        color:red;
+    }
+    .light-green{
+        color:green
+    }
     .container {
         display: flex;
         flex-direction: column;
@@ -140,16 +126,38 @@
         flex-direction: row;
         justify-content: center;
     }
-    .block-link{
+    .block-link-help{
         margin-top: 20px;
         display: flex;
         justify-content: center;
     }
     .block-link-free-restart{
-        margin-top: 20px;
+        margin-top: 10px;
         display: flex;
         justify-content: center;
         cursor: pointer;
     }
 </style>
 
+/*   setTimeout(()=>{
+this.insideData={
+default:{title: 'Is Your Company Name Available?',
+description: 'Enter your desired company name below to ckeck on Companies House..',
+inputPlaceholder: "Enter your desired company name",
+btnText: "Check Now default",
+helpText:'',
+helpLink: ''},
+busy:{title: 'Sorrry COMPANY-NAME is Already Register',
+description: 'Please try a different name...',
+inputPlaceholder: "Enter your desired company name",
+btnText: "Check Now busy",
+helpText: 'Need hepl?Get tips on how name a company',
+helpLink: '/help'},
+free:{title: 'Congratulation COMPANY-NAME Is Available',
+description: 'Secure your chosen name before its too late...',
+inputPlaceholder: "Enter your desired company name",
+btnText: "Check Now free",
+helpText: '',
+helpLink: ''},
+}
+},1000)*/
