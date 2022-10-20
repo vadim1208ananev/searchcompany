@@ -1,4 +1,5 @@
 <template>
+      <full-preloader v-if="!insideData"></full-preloader>
     <div class="container">
         <app-top></app-top>
         <div class="block-form">
@@ -8,6 +9,7 @@
                     <div class="bottom-notify">{{description}}</div>
                 </div>
                 <div class="own-form">
+
                     <div class="form-items">
                         <input
                                 type="text"
@@ -18,6 +20,8 @@
                         <button @click="SendMessage" type="button">{{btnText}}</button>
                     </div>
                 </div>
+                <div v-if="statusFinder=='busy'" class="block-link"><a :href="lowerlinkUrl">{{lowerlinkText}}</a></div>
+
             </div>
         </div>
         <app-bottom></app-bottom>
@@ -26,21 +30,32 @@
 <script>
     import AppTop from "./components/AppTop";
     import AppBottom from "./components/AppBottom";
+    import FullPreloader from "./components/FullPreloader";
 
     export default {
         name: 'App',
         data() {
             return {
+                statusFinder:'defaul',
                 finder: '',
                 title: 'Is Your Company Name Available?',
                 description: 'Enter your desired company name below to ckeck on Companies House..',
                 btnPlaceholder: "Enter your desired company name",
                 btnText: "Check Now",
-                lowerlinkText: '',
-                lowerlinkUrl: '',
+                lowerlinkText: 'Need hepl?Get tips on how name a company',
+                lowerlinkUrl: '/help',
+                insideData:'',
             }
         },
+        mounted(){
+            this.loadInsideData()
+        },
         methods: {
+            loadInsideData(){
+                setTimeout(()=>{
+                   this.insideData=111;
+                },1000)
+            },
             SendMessage() {
                 if (!this.finder.length) return
                 var formdata = new FormData();
@@ -55,6 +70,7 @@
             }
         },
         components: {
+            FullPreloader,
             AppTop, AppBottom
         }
     }
@@ -67,26 +83,26 @@
         max-width: 1410px;
         margin: 0 auto;
     }
-
     .top-block {
         margin-bottom: 20px;
     }
-
     .bottom-block {
         margin-top: 20px;
     }
-
     .top-notify {
         font-weight: bold;
     }
-
     .own-form {
         margin-top: 20px;
     }
-
     .block-form {
         display: flex;
         flex-direction: row;
+        justify-content: center;
+    }
+    .block-link{
+        margin-top: 20px;
+        display: flex;
         justify-content: center;
     }
 </style>
