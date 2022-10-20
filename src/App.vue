@@ -21,6 +21,7 @@
                     </div>
                 </div>
                 <div v-if="statusFinder=='busy'" class="block-link"><a :href="lowerlinkUrl">{{lowerlinkText}}</a></div>
+                <div @click="restart" v-if="statusFinder=='free'" class="block-link-free-restart"><a >{{linkRestartText}}</a></div>
 
             </div>
         </div>
@@ -36,13 +37,14 @@
         name: 'App',
         data() {
             return {
-                statusFinder:'defaul',
+                statusFinder:'free',
                 finder: '',
                 title: 'Is Your Company Name Available?',
                 description: 'Enter your desired company name below to ckeck on Companies House..',
                 btnPlaceholder: "Enter your desired company name",
                 btnText: "Check Now",
                 lowerlinkText: 'Need hepl?Get tips on how name a company',
+                linkRestartText:'Restart Your Search',
                 lowerlinkUrl: '/help',
                 insideData:'',
             }
@@ -51,6 +53,10 @@
             this.loadInsideData()
         },
         methods: {
+            restart(){
+               this.statusFinder='default'
+                this.finder=''
+            },
             loadInsideData(){
                 setTimeout(()=>{
                    this.insideData=111;
@@ -101,6 +107,11 @@
         justify-content: center;
     }
     .block-link{
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+    }
+    .block-link-free-restart{
         margin-top: 20px;
         display: flex;
         justify-content: center;

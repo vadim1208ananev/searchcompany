@@ -55,3 +55,4 @@ if(isset($_POST['search_param'])&&($_POST['search_param'])) {
 
 }
 api_company_return($output);
+//allstatuses=['free','busy','without_params']
