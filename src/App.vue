@@ -1,15 +1,15 @@
 <template>
       <full-preloader v-if="!insideData"></full-preloader>
-    <div class="container">
+    <div v-if="insideData" class="container">
         <app-top></app-top>
         <div class="block-form">
             <div class="block-form-items">
+                {{statusFinder}}
                 <div class="block-notify">
-                    <div class="top-notify">{{title}}</div>
+                    <div class="top-notify">{{getTitle}}</div>
                     <div class="bottom-notify">{{description}}</div>
                 </div>
                 <div class="own-form">
-
                     <div class="form-items">
                         <input
                                 type="text"
@@ -37,7 +37,7 @@
         name: 'App',
         data() {
             return {
-                statusFinder:'free',
+                statusFinder:'default',
                 finder: '',
                 title: 'Is Your Company Name Available?',
                 description: 'Enter your desired company name below to ckeck on Companies House..',
@@ -49,17 +49,47 @@
                 insideData:'',
             }
         },
-        mounted(){
+        created(){
             this.loadInsideData()
+       },
+        computed:{
+         getTitle(){
+
+             return this.insideData[this.statusFinder].title
+         }
         },
-        methods: {
+     methods:{
             restart(){
                this.statusFinder='default'
                 this.finder=''
             },
             loadInsideData(){
                 setTimeout(()=>{
-                   this.insideData=111;
+                   this.insideData={
+
+                       default:{title: 'Is Your Company Name Available?default',
+                           description: 'Enter your desired company name below to ckeck on Companies House..',
+                           btnPlaceholder: "Enter your desired company name",
+                           btnText: "Check Now",
+                           lowerlinkText: 'Need hepl?Get tips on how name a company',
+                           linkRestartText:'Restart Your Search',
+                           lowerlinkUrl: '/help'},
+
+                       busy:{title: 'Is Your Company Name Available?busy',
+                           description: 'Enter your desired company name below to ckeck on Companies House..',
+                           btnPlaceholder: "Enter your desired company name",
+                           btnText: "Check Now",
+                           lowerlinkText: 'Need hepl?Get tips on how name a company',
+                           linkRestartText:'Restart Your Search',
+                           lowerlinkUrl: '/help'},
+                       free:{title: 'Is Your Company Name Available?free',
+                           description: 'Enter your desired company name below to ckeck on Companies House..',
+                           btnPlaceholder: "Enter your desired company name",
+                           btnText: "Check Now",
+                           lowerlinkText: 'Need hepl?Get tips on how name a company',
+                           linkRestartText:'Restart Your Search',
+                           lowerlinkUrl: '/help'},
+                   }
                 },1000)
             },
             SendMessage() {
@@ -72,7 +102,11 @@
                 }
                 fetch(`http://search.loc/api.php`,requestOptions)
                     .then(res=>res.json())
-                    .then(row=>{console.log(row);});
+                    .then(row=>{
+                        console.log(row.status)
+                        this.statusFinder=row.status
+
+                    });
             }
         },
         components: {
@@ -115,6 +149,7 @@
         margin-top: 20px;
         display: flex;
         justify-content: center;
+        cursor: pointer;
     }
 </style>
 
