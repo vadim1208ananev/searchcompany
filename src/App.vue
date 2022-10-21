@@ -72,7 +72,7 @@
                 this.finderInput=''
             },
             loadInsideData(){
-                getCaption(1).then(row=>{
+                getCaption().then(row=>{
                     console.log(row)
                     this.insideData=row})
 
