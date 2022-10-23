@@ -18,11 +18,3 @@
             ['statusDisplay']
     }
 </script>
-
-<style>
-    .textareablock{
-        margin:10px;
-        display: flex;
-        gap:20px
-    }
-</style>

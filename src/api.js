@@ -10,6 +10,7 @@ export const getCaption=()=>{
         body:formdata
     }
    return  fetch(`${ROOT_SELF}/wp-admin/admin-ajax.php`,requestOptions)
+   // return  fetch(`${ROOT_SELF}/headers.php`,requestOptions)
         .then(res=>res.json())
 }
 export const sendRequest=(data)=>{
@@ -21,6 +22,7 @@ export const sendRequest=(data)=>{
                    body:formdata,
                }
             return   fetch(`${ROOT_SELF}/wp-admin/admin-ajax.php`,requestOptions)
+   // return   fetch(`${ROOT_SELF}/api.php`,requestOptions)
                    .then(res=>res.json())
 
 }
